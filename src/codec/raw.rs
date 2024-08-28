@@ -1,4 +1,5 @@
 use crate::{PixelFormat, Rect, VncError, VncEvent};
+use crate::ImageRectangle;
 use std::future::Future;
 use tokio::io::{AsyncRead, AsyncReadExt};
 
@@ -17,7 +18,7 @@ impl Decoder {
         rect: &Rect,
         input: &mut S,
         output_func: &F,
-    ) -> Result<(), VncError>
+    ) -> Result<ImageRectangle, VncError>
     where
         S: AsyncRead + Unpin,
         F: Fn(VncEvent) -> Fut,
@@ -32,7 +33,10 @@ impl Decoder {
         let buffer_size = bpp as usize * rect.height as usize * rect.width as usize;
         let mut pixels = uninit_vec(buffer_size);
         input.read_exact(&mut pixels).await?;
-        output_func(VncEvent::RawImage(*rect, pixels)).await?;
-        Ok(())
+        //output_func(VncEvent::RawImage(*rect, pixels)).await?;
+        Ok(ImageRectangle {
+		rect: *rect,
+		data: pixels
+	})
     }
 }

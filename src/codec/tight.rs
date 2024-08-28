@@ -137,7 +137,7 @@ impl Decoder {
                 image.extend_from_slice(&true_color);
             }
         }
-        output_func(VncEvent::RawImage(*rect, image)).await?;
+        //output_func(VncEvent::RawImage(*rect, image)).await?;
         Ok(())
     }
 
@@ -230,7 +230,7 @@ impl Decoder {
             j += 3;
         }
 
-        output_func(VncEvent::RawImage(*rect, image)).await?;
+        //output_func(VncEvent::RawImage(*rect, image)).await?;
 
         Ok(())
     }
@@ -305,7 +305,7 @@ impl Decoder {
             }
             dp += 4;
         }
-        output_func(VncEvent::RawImage(*rect, image)).await?;
+        //output_func(VncEvent::RawImage(*rect, image)).await?;
         Ok(())
     }
 
@@ -334,7 +334,7 @@ impl Decoder {
             dp += 4;
             i += 1;
         }
-        output_func(VncEvent::RawImage(*rect, image)).await?;
+       // output_func(VncEvent::RawImage(*rect, image)).await?;
         Ok(())
     }
 
@@ -404,7 +404,7 @@ impl Decoder {
             }
         }
 
-        output_func(VncEvent::RawImage(*rect, image)).await?;
+        //output_func(VncEvent::RawImage(*rect, image)).await?;
         Ok(())
     }
 

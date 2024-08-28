@@ -201,6 +201,7 @@ impl Decoder {
                         return Err(VncError::InvalidImageData);
                     }
                 }
+/*
                 output_func(VncEvent::RawImage(
                     Rect {
                         x: rect.x + x,
@@ -211,6 +212,7 @@ impl Decoder {
                     pixels,
                 ))
                 .await?;
+*/
                 x += width;
             }
             y += height;

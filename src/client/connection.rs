@@ -17,6 +17,8 @@ use tokio_util::compat::*;
 use tracing::*;
 
 use crate::{codec, PixelFormat, Rect, VncEncoding, VncError, VncEvent, X11Event};
+use crate::ImageRectangle;
+
 const CHANNEL_SIZE: usize = 4096;
 
 #[cfg(not(target_arch = "wasm32"))]
@@ -391,10 +393,13 @@ where
     let mut trle_decoder = codec::TrleDecoder::new();
     let mut cursor = codec::CursorDecoder::new();
 
+    let mut raw_rects : Vec<ImageRectangle> = Vec::new();
+
     // main decoding loop
     while let Err(oneshot::error::TryRecvError::Empty) = stop_ch.try_recv() {
         let server_msg = ServerMsg::read(stream).await?;
         trace!("Server message got: {:?}", server_msg);
+
         match server_msg {
             ServerMsg::FramebufferUpdate(rect_num) => {
                 for _ in 0..rect_num {
@@ -403,9 +408,10 @@ where
 
                     match rect.encoding {
                         VncEncoding::Raw => {
-                            raw_decoder
+                            let rect = raw_decoder
                                 .decode(pf, &rect.rect, stream, output_func)
                                 .await?;
+    			            raw_rects.push(rect);
                         }
                         VncEncoding::CopyRect => {
                             let source_x = stream.read_u16().await?;
@@ -444,6 +450,9 @@ where
                         }
                     }
                 }
+
+                output_func(VncEvent::RawImage(raw_rects.clone())).await?;
+                raw_rects.clear();
             }
             // SetColorMapEntries,
             ServerMsg::Bell => {
